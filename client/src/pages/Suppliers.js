@@ -6,7 +6,7 @@ export default function Suppliers() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/suppliers')
+    api.get('/api/suppliers')
       .then((res) => setSuppliers(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));

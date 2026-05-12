@@ -15,7 +15,7 @@ export default function Products() {
     if (filters.minScore > 0) params.minScore = filters.minScore;
     if (filters.search) params.search = filters.search;
 
-    api.get('/products', { params })
+    api.get('/api/products', { params })
       .then((res) => setProducts(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));

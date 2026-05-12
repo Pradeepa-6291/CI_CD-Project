@@ -15,7 +15,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/products?limit=8')
+    api.get(`/api/products?limit=8`)
       .then((res) => setProducts(res.data.slice(0, 8)))
       .catch(console.error)
       .finally(() => setLoading(false));
