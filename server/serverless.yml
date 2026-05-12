@@ -1,0 +1,45 @@
+service: ecothix-backend
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+  stage: prod
+  timeout: 30
+  memorySize: 512
+  environment:
+    MONGO_URI: ${env:MONGO_URI}
+    JWT_SECRET: ${env:JWT_SECRET}
+    NODE_ENV: production
+    CLIENT_URL: ${env:CLIENT_URL}
+
+functions:
+  api:
+    handler: server.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+package:
+  exclude:
+    - .env
+    - '*.test.js'
+    - README.md
+    - .git/**
+    - node_modules/.cache/**
