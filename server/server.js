@@ -1,6 +1,9 @@
 require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
+const serverless = require('serverless-http');
+
 const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
@@ -8,12 +11,12 @@ const productRoutes = require('./routes/productRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
-// Connect DB
+// Connect MongoDB
 connectDB();
 
 const app = express();
 
-// ✅ CORS (FIXED - allow all for now)
+// ✅ CORS
 app.use(cors({
   origin: "*",
 }));
@@ -24,9 +27,11 @@ app.options('*', cors());
 // Middleware
 app.use(express.json());
 
-// Test route
+// Test Route
 app.get('/', (req, res) => {
-  res.json({ message: '🌿 Ecothix API Running' });
+  res.json({
+    message: '🌿 Ecothix API Running on AWS Lambda'
+  });
 });
 
 // Routes
@@ -37,7 +42,9 @@ app.use('/api/orders', orderRoutes);
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+  res.status(404).json({
+    message: 'Route not found'
+  });
 });
 
 // Error handler
@@ -49,9 +56,18 @@ app.use((err, req, res, next) => {
   });
 });
 
-// PORT
-const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+// ✅ LOCAL TESTING
+if (process.env.NODE_ENV !== 'production') {
+
+  const PORT = process.env.PORT || 5001;
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Local Server running on port ${PORT}`);
+  });
+
+}
+
+
+// ✅ EXPORT FOR AWS LAMBDA
+module.exports.handler = serverless(app);
