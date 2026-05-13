@@ -41,8 +41,8 @@ export default function Dashboard() {
 
         if (user.role === 'supplier' || user.role === 'admin') {
           const [productsRes, allOrdersRes] = await Promise.all([
-            api.get('/api/products'),
-            api.get('/api/orders/all'),
+            api.get('/products'),
+            api.get('/orders/all'),
           ]);
           if (cancelled) return;
           setProducts(productsRes.data);
@@ -51,8 +51,8 @@ export default function Dashboard() {
 
         if (user.role === 'admin') {
           const [allOrdersRes, usersRes] = await Promise.all([
-            api.get('/api/orders'),
-            api.get('/api/auth/users'),
+            api.get('/orders'),
+            api.get('/auth/users'),
           ]);
           if (cancelled) return;
           setAllOrders(allOrdersRes.data);

@@ -21,7 +21,7 @@ export default function ProductDetail() {
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
-    api.get(`/api/products/${id}`)
+    api.get(`/products/${id}`)
       .then((res) => setProduct(res.data))
       .catch(() => navigate('/products'))
       .finally(() => setLoading(false));

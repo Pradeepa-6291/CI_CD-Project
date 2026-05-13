@@ -16,7 +16,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+      const endpoint = isLogin ? '/auth/login' : '/auth/register';
       const payload = isLogin ? { email: form.email, password: form.password } : form;
       const { data } = await api.post(endpoint, payload);
       login(data);
