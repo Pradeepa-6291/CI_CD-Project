@@ -13,56 +13,41 @@ connectDB();
 
 const app = express();
 
-// ✅ CORS — allow Amplify + localhost
-const allowedOrigins = [
-  'http://localhost:3000',
-  process.env.CLIENT_URL,
-].filter(Boolean);
-
+// ✅ CORS — wildcard for Lambda + API Gateway
 app.use(cors({
-  origin: (origin, callback) => {
-    // allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    // allow all amplify domains
-    if (origin.endsWith('.amplifyapp.com')) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// ✅ Handle preflight OPTIONS for all routes
 app.options('*', cors());
-
 app.use(express.json());
 
 // Health check
 app.get('/', (req, res) => res.json({ message: '🌿 Ecothix API Running' }));
 
-// ✅ All routes under /api
+// ✅ All routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/orders', orderRoutes);
 
-// 404 handler
+// 404
 app.use((req, res) => {
   res.status(404).json({ message: `Route ${req.path} not found` });
 });
 
-// Global error handler
+// Error handler
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.error(err.stack);
   res.status(err.status || 500).json({ message: err.message || 'Server Error' });
 });
 
-// ✅ Local development
+// Local dev
 if (require.main === module) {
   const PORT = process.env.PORT || 5001;
   app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 }
 
-// ✅ AWS Lambda export
+// ✅ Lambda export
 module.exports.handler = serverless(app);
