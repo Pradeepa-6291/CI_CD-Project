@@ -3,16 +3,14 @@ frontend:
   phases:
     preBuild:
       commands:
-        - cd client
         - npm install
     build:
       commands:
-        - cd client
         - npm run build
   artifacts:
-    baseDirectory: client/build
+    baseDirectory: build
     files:
       - '**/*'
   cache:
     paths:
-      - client/node_modules/**/*
+      - node_modules/**/*
