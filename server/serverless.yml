@@ -12,29 +12,30 @@ provider:
     JWT_SECRET: ${env:JWT_SECRET}
     NODE_ENV: production
     CLIENT_URL: ${env:CLIENT_URL}
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
 
 functions:
   api:
     handler: server.handler
     events:
-      - http:
+      - httpApi:
           path: /
           method: ANY
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - Authorization
-            allowCredentials: false
-      - http:
+      - httpApi:
           path: /{proxy+}
           method: ANY
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - Authorization
-            allowCredentials: false
 
 package:
   exclude:
