@@ -9,24 +9,21 @@ const productRoutes = require('./routes/productRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
-connectDB();
-
 const app = express();
 
-// ✅ CORS — wildcard for Lambda + API Gateway
+// ✅ CORS
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-
 app.options('*', cors());
 app.use(express.json());
 
 // Health check
 app.get('/', (req, res) => res.json({ message: '🌿 Ecothix API Running' }));
 
-// ✅ All routes
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/suppliers', supplierRoutes);
@@ -43,11 +40,19 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   res.status(err.status || 500).json({ message: err.message || 'Server Error' });
 });
 
-// Local dev
+// ✅ Local dev
 if (require.main === module) {
   const PORT = process.env.PORT || 5001;
-  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  connectDB().then(() => {
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  });
 }
 
-// ✅ Lambda export
-module.exports.handler = serverless(app);
+// ✅ Lambda handler — await DB connection before handling request
+const serverlessHandler = serverless(app);
+
+module.exports.handler = async (event, context) => {
+  context.callbackWaitsForEmptyEventLoop = false; // ✅ critical for Lambda + MongoDB
+  await connectDB(); // ✅ ensure DB connected before every request
+  return serverlessHandler(event, context);
+};

@@ -3,32 +3,20 @@ const mongoose = require('mongoose');
 let isConnected = false;
 
 const connectDB = async () => {
-
-  // ✅ Reuse existing connection
   if (isConnected) {
-    console.log('✅ Using existing MongoDB connection');
+    console.log('✅ Reusing existing MongoDB connection');
     return;
   }
-
   try {
-
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-
+    await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 10000,
-
-      // Recommended for Lambda
-      bufferCommands: false,
+      // ✅ removed bufferCommands:false — was causing the error
     });
-
     isConnected = true;
-
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-
+    console.log('✅ MongoDB Connected');
   } catch (error) {
-
-    console.error(`❌ MongoDB Connection Failed: ${error.message}`);
-
-    throw error;
+    console.error('❌ MongoDB Connection Failed:', error.message);
+    throw error; // ✅ throw so Lambda knows connection failed
   }
 };
 
